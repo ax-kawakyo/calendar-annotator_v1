@@ -464,6 +464,91 @@
     }
      .popover-footer button:hover { background-color: #d0e7ff; }
 
+    /* --- レスポンシブデザイン --- */
+    @media (max-width: 768px) {
+      body {
+        -webkit-text-size-adjust: 100%; /* iOSでの自動フォントサイズ調整を無効化 */
+      }
+      #root {
+        padding: 0;
+      }
+      .app-container {
+        min-width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .header {
+        padding: 12px;
+      }
+      .header-top {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .header-title {
+        font-size: 1.25em;
+      }
+      .header-controls {
+        flex-wrap: wrap;
+        gap: 12px;
+        width: 100%;
+      }
+      .id-control {
+        margin-left: 0;
+        width: 100%;
+      }
+      .id-control input {
+        min-width: 0;
+        flex-grow: 1;
+      }
+      .data-ops {
+        margin-left: 0;
+        width: 100%;
+        justify-content: space-between;
+      }
+      .data-ops button {
+        flex-grow: 1;
+        padding: 10px 8px;
+        font-size: 0.85em;
+      }
+      .decoration-bar {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 12px;
+      }
+      .calendar-board {
+        padding: 4px;
+      }
+      .day-header {
+        padding: 6px 0;
+        font-size: 0.8em;
+      }
+      .date-cell {
+        min-height: 80px;
+        padding: 4px;
+      }
+      .date-number {
+        font-size: 0.8em;
+      }
+      .date-number.today {
+        width: 20px;
+        height: 20px;
+      }
+      .label {
+        font-size: 0.75em;
+        padding: 2px 4px;
+        min-height: 16px;
+      }
+      #popover {
+        /* 画面下部からスライドアップするような見た目も良いが、まずは中央に表示 */
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%);
+        max-width: 90vw;
+        box-sizing: border-box;
+      }
+    }
+
   </style>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -628,6 +713,11 @@
         
         popover.innerHTML = popoverHtml;
         popover.style.display = 'block';
+
+        // スマホの場合はtransformをリセット
+        if (window.innerWidth <= 768) {
+            popover.style.transform = '';
+        }
 
         if (type === 'yearMonth') {
              const yearInput = document.getElementById('year-input');
