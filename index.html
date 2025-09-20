@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -287,6 +288,7 @@
       min-height: 20px;
       width: calc(100% - 10px); /* 親要素から少し内側に */
       word-wrap: break-word; /* テキストの折り返し */
+      transition: transform 0.2s, box-shadow 0.2s, outline 0.2s;
     }
     .label.editing {
       outline: 2px solid var(--primary-color);
@@ -304,6 +306,17 @@
       z-index: 999;
       width: auto; 
     }
+    .label.is-being-moved {
+      outline: 2px dashed #ff8f00;
+      box-shadow: 0 4px 12px rgba(255, 143, 0, 0.4);
+      transform: scale(1.05);
+      z-index: 50;
+    }
+    
+    body.is-moving-label .date-cell:not(.other-month):hover {
+      background-color: #fff8e1; /* Light yellow, indicating a valid drop target */
+    }
+
 
     /* ポップオーバー */
     #popover {
@@ -325,6 +338,7 @@
     .popover-actions {
         display: flex;
         gap: 6px;
+        flex-wrap: wrap; /* ボタンが折り返せるように */
     }
     .popover-template-section {
         display: flex;
@@ -414,6 +428,17 @@
         border-color: #f1b0b7;
     }
     
+    /* Move action - Light Orange */
+    .popover-btn[data-action="move"] {
+        background-color: #fff8e1;
+        color: #ff8f00;
+        border: 1px solid #ffecb3;
+    }
+    .popover-btn[data-action="move"]:hover {
+        background-color: #ffefc2;
+        border-color: #ffe082;
+    }
+
     /* --- Year Month Popover --- */
     .year-month-popover-content {
         display: flex;
@@ -553,6 +578,7 @@
     let activeLabelInfo = null; // { type, id?, date?, text?, top?, left?, style? }
     let clipboard = null; // { text, style }
     let dragInfo = null; // { id, element, offsetX, offsetY, hasMoved, startX, startY }
+    let moveInfo = null; // { labelId } - for tap-based moving on mobile
     let defaultStyle = {
         color: '#333333',
         backgroundColor: '#fffbe6',
@@ -686,7 +712,7 @@
                 let pasteButtonHtml = clipboard ? `<button class="popover-btn" data-action="paste">貼付</button>` : '';
                 buttonsHtml = `${pasteButtonHtml}<button class="popover-btn" data-action="save">保存</button><button class="popover-btn" data-action="cancel">取消</button>`;
             } else { // 'existingLabel'
-                buttonsHtml = `<button class="popover-btn" data-action="update">更新</button><button class="popover-btn" data-action="copy">コピー</button><button class="popover-btn" data-action="delete">削除</button>`;
+                buttonsHtml = `<button class="popover-btn" data-action="update">更新</button><button class="popover-btn" data-action="move">移動</button><button class="popover-btn" data-action="copy">コピー</button><button class="popover-btn" data-action="delete">削除</button>`;
             }
             popoverHtml = `<div class="popover-actions">${buttonsHtml}</div>`;
             // ポップオーバーをラベルの右側に表示
@@ -717,9 +743,10 @@
     };
     
     const hidePopover = () => {
-        if(activeLabelInfo || selectedDateForTemplate) {
+        if(activeLabelInfo || selectedDateForTemplate || moveInfo) {
             activeLabelInfo = null;
             selectedDateForTemplate = null;
+            moveInfo = null; // 移動モードもキャンセル
             render();
         }
         popover.style.display = 'none';
@@ -779,6 +806,27 @@
 
     // --- イベントハンドラ ---
     const handleCalendarClick = (e) => {
+        // 移動モードの場合の処理を最優先
+        if (moveInfo) {
+            const targetCell = e.target.closest('.date-cell');
+            if (targetCell) {
+                const labelToMove = labels.find(l => l.id === moveInfo.labelId);
+                if (labelToMove) {
+                    const newDate = targetCell.dataset.date;
+                    // 移動先の既存ラベル数を考慮してtopを決定
+                    const labelsOnNewDate = labels.filter(l => l.date === newDate && l.id !== labelToMove.id).length;
+                    labelToMove.date = newDate;
+                    labelToMove.top = 5 + labelsOnNewDate * 28; // 衝突を避ける
+                    labelToMove.left = 5;
+                }
+            }
+            // セルをクリックしたかどうかにかかわらず、移動モードを終了
+            moveInfo = null;
+            saveLabelsToLocalStorage();
+            render();
+            return; // これ以降のクリック処理は行わない
+        }
+        
         if (dragInfo && dragInfo.hasMoved) return;
 
         const clickedLabelEl = e.target.closest('.label');
@@ -847,7 +895,7 @@
     
     const handleCalendarDblClick = (e) => {
         const clickedCellEl = e.target.closest('.date-cell:not(.other-month)');
-        if (!clickedCellEl) return;
+        if (!clickedCellEl || moveInfo) return; // 移動モード中は新規作成しない
         
         hidePopover();
 
@@ -959,6 +1007,14 @@
                     hidePopover();
                 }
                 break;
+            case 'move':
+                if (activeLabelInfo?.type === 'existing') {
+                    moveInfo = { labelId: activeLabelInfo.id };
+                    activeLabelInfo = null; // 編集モードを解除
+                    popover.style.display = 'none'; // ポップオーバーだけ閉じる
+                    render(); // 移動モードのUIを反映
+                }
+                return; // hidePopover()を呼ばない
             case 'cancel':
                 hidePopover();
                 break;
@@ -1063,7 +1119,7 @@
         }
         
         // 上記の条件に当てはまらない場合（＝外側をクリックした場合）にポップオーバーを閉じる
-        if (activeLabelInfo || selectedDateForTemplate) {
+        if (activeLabelInfo || selectedDateForTemplate || moveInfo) {
             hidePopover();
             updateDecorationBar();
         }
@@ -1071,8 +1127,12 @@
 
     // --- Drag and Drop Handlers ---
     const handleDragStart = (e) => {
+        // タッチデバイスではドラッグ＆ドロップを無効化
+        if (window.matchMedia("(pointer: coarse)").matches) {
+            return;
+        }
         const labelEl = e.target.closest('.label');
-        if (!labelEl || labelEl.isContentEditable) return;
+        if (!labelEl || labelEl.isContentEditable || moveInfo) return;
 
         hidePopover();
 
@@ -1228,6 +1288,8 @@
 
     // --- レンダリング関数 ---
     const render = () => {
+      document.body.classList.toggle('is-moving-label', !!moveInfo);
+
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
 
@@ -1273,7 +1335,8 @@
         const labelsForDate = labels.filter(label => label.date === dateStr);
         let labelsHtml = labelsForDate.map(label => {
             const isEditing = activeLabelInfo?.type === 'existing' && activeLabelInfo.id === label.id;
-            const classes = `label ${isEditing ? 'editing' : ''}`;
+            const isBeingMoved = moveInfo?.labelId === label.id;
+            const classes = `label ${isEditing ? 'editing' : ''} ${isBeingMoved ? 'is-being-moved' : ''}`;
             const style = getLabelStyle(label.style);
             return `
             <div class="${classes}"
@@ -1384,12 +1447,13 @@
       document.addEventListener('click', handleDocumentClick);
 
       const decoBar = document.querySelector('.decoration-bar');
-      decoBar.addEventListener('input', handleDecorationChange);
-      decoBar.querySelectorAll('button').forEach(btn => {
-          btn.addEventListener('click', handleDecorationChange);
-      });
-      
-      updateDecorationBar();
+      if (decoBar) { // スマホでは存在しないのでnullチェック
+        decoBar.addEventListener('input', handleDecorationChange);
+        decoBar.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', handleDecorationChange);
+        });
+        updateDecorationBar();
+      }
     };
 
     // --- 初期化 ---
