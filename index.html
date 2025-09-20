@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -604,7 +605,7 @@
         height: auto;
       }
       .date-cell {
-        min-height: 100px; /* セルの高さを確保 */
+        min-height: 85px; /* セルの高さを調整 */
         padding: 4px;
         display: flex;
         flex-direction: column;
@@ -1059,14 +1060,18 @@
 
 
         switch(action) {
-            case 'prev-year':
+            case 'prev-year': {
                 currentDate.setFullYear(currentDate.getFullYear() - 1);
-                showPopover(document.getElementById('year-month-selector'), 'yearMonth');
+                const yearInput = popover.querySelector('#year-input');
+                if (yearInput) yearInput.value = currentDate.getFullYear();
                 return;
-            case 'next-year':
-                 currentDate.setFullYear(currentDate.getFullYear() + 1);
-                 showPopover(document.getElementById('year-month-selector'), 'yearMonth');
-                 return;
+            }
+            case 'next-year': {
+                currentDate.setFullYear(currentDate.getFullYear() + 1);
+                const yearInput = popover.querySelector('#year-input');
+                if (yearInput) yearInput.value = currentDate.getFullYear();
+                return;
+            }
             case 'go-today':
                  currentDate = new Date();
                  hidePopover();
