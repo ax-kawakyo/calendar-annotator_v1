@@ -54,10 +54,9 @@
     }
     .header-top {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
-      gap: 20px;
+      gap: 16px;
     }
     .header-title {
       font-size: 1.5em;
@@ -76,17 +75,11 @@
         background-color: #f0f0f0;
     }
 
-    .header-controls {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        width: 100%;
-    }
     .id-control {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-left: 24px;
+        margin-left: auto; /* Push this and following elements to the right */
     }
     .id-control label {
         font-size: 1em;
@@ -102,7 +95,6 @@
         min-width: 200px;
     }
     .data-ops {
-        margin-left: auto; /* 右寄せ */
         display: flex;
         gap: 8px;
     }
@@ -488,21 +480,15 @@
       .header-title {
         font-size: 1.25em;
       }
-      .header-controls {
-        flex-wrap: wrap;
-        gap: 12px;
-        width: 100%;
-      }
       .id-control {
         margin-left: 0;
-        width: 100%;
+        flex-grow: 1; /* Take up remaining space */
       }
       .id-control input {
         min-width: 0;
-        flex-grow: 1;
+        width: 100%;
       }
       .data-ops {
-        margin-left: 0;
         width: 100%;
         justify-content: space-between;
       }
@@ -512,9 +498,7 @@
         font-size: 0.85em;
       }
       .decoration-bar {
-        flex-wrap: wrap;
-        padding: 8px 12px;
-        gap: 12px;
+        display: none;
       }
       .calendar-board {
         padding: 4px;
@@ -744,6 +728,7 @@
     
     // --- Decoration Bar Functions ---
     const updateDecorationBar = () => {
+        if (window.innerWidth <= 768) return; // スマホでは非表示なので何もしない
         const currentStyle = activeLabelInfo?.style || defaultStyle;
 
         document.getElementById('text-color-picker').value = currentStyle.color;
@@ -1327,16 +1312,14 @@
                   ${year}年 ${month + 1}月
                 </span>
               </h1>
-              <div class="header-controls">
-                <div class="id-control">
-                  <label for="calendar-id">ID:</label>
-                  <input type="text" id="calendar-id" placeholder="スケジュール名を入力">
-                </div>
-                <div class="data-ops">
-                   <button id="new-btn">新規</button>
-                   <button id="save-btn">保存</button>
-                   <button id="import-btn">読込</button>
-                </div>
+              <div class="id-control">
+                <label for="calendar-id">ID:</label>
+                <input type="text" id="calendar-id" placeholder="スケジュール名を入力">
+              </div>
+              <div class="data-ops">
+                 <button id="new-btn">新規</button>
+                 <button id="save-btn">保存</button>
+                 <button id="import-btn">読込</button>
               </div>
             </div>
             <div class="decoration-bar">
