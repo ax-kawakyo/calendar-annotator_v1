@@ -573,6 +573,13 @@
         width: 100%;
         pointer-events: none; /* Make clicks pass through to the parent container */
       }
+      .id-control input:read-only {
+        pointer-events: none;
+      }
+      .id-control input:not(:read-only) {
+        pointer-events: auto;
+        cursor: text;
+      }
       .id-control::after {
         content: '☰';
         color: #888;
@@ -1341,6 +1348,19 @@
         selectedDateForTemplate = null;
         saveLabelsToLocalStorage();
         render();
+        
+        // After render, make input editable on mobile
+        if (window.innerWidth <= 768) {
+            const idInput = document.getElementById('calendar-id');
+            idInput.readOnly = false;
+            idInput.focus();
+            idInput.select(); // Select current text for easy replacement
+            
+            // Add a one-time listener to make it readonly again on blur
+            idInput.addEventListener('blur', () => {
+                idInput.readOnly = true;
+            }, { once: true });
+        }
     };
 
     const handleSave = () => {
@@ -1481,6 +1501,8 @@
         `;
       }).join('');
       
+      const isMobile = window.innerWidth <= 768;
+
       const appHtml = `
         <div class="app-container">
           <header class="header">
@@ -1492,7 +1514,7 @@
                         </span>
                     </h1>
                     <div id="id-control-container" class="id-control">
-                        <input type="text" id="calendar-id" placeholder="スケジュール名を入力">
+                        <input type="text" id="calendar-id" placeholder="スケジュール名を入力" ${isMobile ? 'readonly' : ''}>
                     </div>
                 </div>
                 <div class="data-ops">
@@ -1557,6 +1579,11 @@
       const idControlContainer = document.getElementById('id-control-container');
       idControlContainer.addEventListener('click', (e) => {
         if (window.innerWidth > 768) return;
+        const idInput = document.getElementById('calendar-id');
+        // 入力モードの時はポップオーバーを出さない
+        if (idInput && !idInput.readOnly) {
+          return;
+        }
         e.stopPropagation();
         showPopover(idControlContainer, 'dataOps');
       });
