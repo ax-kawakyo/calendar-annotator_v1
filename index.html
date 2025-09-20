@@ -571,6 +571,7 @@
         font-size: 1em;
         background: transparent;
         width: 100%;
+        pointer-events: none; /* Make clicks pass through to the parent container */
       }
       .id-control::after {
         content: '☰';
@@ -593,6 +594,7 @@
         padding: 4px 0;
         font-size: 0.75em;
         font-weight: 500;
+        height: auto;
       }
       .date-cell {
         min-height: 100px; /* セルの高さを確保 */
@@ -1555,8 +1557,6 @@
       const idControlContainer = document.getElementById('id-control-container');
       idControlContainer.addEventListener('click', (e) => {
         if (window.innerWidth > 768) return;
-        // input自体をクリックした場合はpopoverを出さない
-        if (e.target.tagName === 'INPUT') return;
         e.stopPropagation();
         showPopover(idControlContainer, 'dataOps');
       });
