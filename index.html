@@ -329,6 +329,25 @@
       transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
       min-width: 280px;
     }
+    .popover-close-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 24px;
+        height: 24px;
+        border: none;
+        background: transparent;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        color: #888;
+        opacity: 0.7;
+    }
+    .popover-close-btn:hover {
+        opacity: 1;
+        color: #000;
+    }
+
     .popover-content {
         display: flex;
         flex-direction: column;
@@ -385,14 +404,16 @@
     /* Constructive actions (Apply, Update, Paste) - Light Blue */
     .popover-btn[data-action="apply-template"],
     .popover-btn[data-action="update"],
-    .popover-btn[data-action="paste"] {
+    .popover-btn[data-action="paste"],
+    .popover-btn[data-action="import"] {
         background-color: #e7f3ff;
         color: #005bb5;
         border: 1px solid #b3d7ff;
     }
     .popover-btn[data-action="apply-template"]:hover,
     .popover-btn[data-action="update"]:hover,
-    .popover-btn[data-action="paste"]:hover {
+    .popover-btn[data-action="paste"]:hover,
+    .popover-btn[data-action="import"]:hover {
         background-color: #d0e7ff;
         border-color: #8ac2ff;
     }
@@ -400,14 +421,16 @@
     /* Creation actions (Save Template, Save Label, Copy) - Light Green */
     .popover-btn[data-action="save-as-template"],
     .popover-btn[data-action="save"],
-    .popover-btn[data-action="copy"] {
+    .popover-btn[data-action="copy"],
+    .popover-btn[data-action="save-json"] {
         background-color: #e6f7f0;
         color: #1e875a;
         border: 1px solid #a3d9c0;
     }
     .popover-btn[data-action="save-as-template"]:hover,
     .popover-btn[data-action="save"]:hover,
-    .popover-btn[data-action="copy"]:hover {
+    .popover-btn[data-action="copy"]:hover,
+    .popover-btn[data-action="save-json"]:hover {
         background-color: #d1f0e3;
         border-color: #82c9ab;
     }
@@ -427,6 +450,16 @@
         border-color: #f1b0b7;
     }
     
+    /* New action - Light Yellow */
+    .popover-btn[data-action="new"] {
+        background-color: #fffbe6;
+        color: #856404;
+        border-color: #ffeeba;
+    }
+    .popover-btn[data-action="new"]:hover {
+        background-color: #fff8d6;
+    }
+
     /* Move action - Light Orange */
     .popover-btn[data-action="move"] {
         background-color: #fff8e1;
@@ -501,38 +534,52 @@
       .header-top {
         flex-direction: column;
         gap: 8px;
-        margin-bottom: 8px;
+        margin-bottom: 0;
       }
       .header-title-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
+        gap: 8px;
       }
       .header-title {
-        font-size: 1.1em;
+        font-size: 1.2em;
         margin: 0;
+        flex-shrink: 0;
       }
       .id-control {
         margin-left: 0;
         flex-grow: 1;
         width: 100%;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 6px 10px;
+        background-color: #f9f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 0;
+      }
+      .id-control:hover {
+        background-color: #f0f0f0;
       }
       .id-control input {
-        min-width: 0;
+        border: none;
+        padding: 0;
+        font-size: 1em;
+        background: transparent;
         width: 100%;
-        font-size: 0.9em;
-        padding: 6px 10px;
+      }
+      .id-control::after {
+        content: '☰';
+        color: #888;
+        font-size: 1.1em;
+        margin-left: 8px;
       }
       .data-ops {
-        width: 100%;
-        justify-content: space-between;
-        gap: 6px;
-      }
-      .data-ops button {
-        flex-grow: 1;
-        padding: 8px 6px;
-        font-size: 0.8em;
+        display: none; /* Hide original buttons on mobile */
       }
       .decoration-bar {
         display: none;
@@ -543,12 +590,18 @@
         overflow-y: auto; /* カレンダー部分がスクロールできるように */
       }
       .day-header {
-        padding: 6px 0;
-        font-size: 0.8em;
+        padding: 4px 0;
+        font-size: 0.75em;
+        font-weight: 500;
       }
       .date-cell {
-        min-height: 80px;
+        min-height: 100px; /* セルの高さを確保 */
         padding: 4px;
+        display: flex;
+        flex-direction: column;
+      }
+      .labels-container {
+        flex-grow: 1;
       }
       .date-number {
         font-size: 0.8em;
@@ -576,8 +629,8 @@
         .header-title {
             font-size: 1em;
         }
-        .id-control label {
-            display: none; /* very small screens, hide label */
+        .id-control input::placeholder {
+            font-size: 0.9em;
         }
     }
 
@@ -680,11 +733,11 @@
     // --- Popover Functions ---
     const showPopover = (targetElement, type) => {
         const rect = targetElement.getBoundingClientRect();
-        let popoverHtml = '';
+        let popoverHtml = `<button class="popover-close-btn" data-action="close">&times;</button>`;
 
         if (type === 'cell') {
             const templateOptionsHtml = templates.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-            popoverHtml = `
+            popoverHtml += `
                 <div class="popover-content">
                     <div class="popover-template-section">
                         <label class="popover-section-label" for="popover-template-select">テンプレートを適用</label>
@@ -716,7 +769,7 @@
                 const isCurrent = i === month;
                 monthsHtml += `<button class="month-grid-item ${isCurrent ? 'current' : ''}" data-month="${i}">${i + 1}月</button>`;
             }
-            popoverHtml = `
+            popoverHtml += `
                 <div class="year-month-popover-content">
                     <div class="year-selector-header">
                         <button data-action="prev-year">‹</button>
@@ -731,6 +784,18 @@
              popover.style.left = `${rect.left}px`;
              popover.style.top = `${rect.bottom + 8}px`;
 
+        } else if (type === 'dataOps') {
+            popoverHtml += `
+                <div class="popover-content">
+                    <div class="popover-actions" style="flex-direction: column;">
+                        <button class="popover-btn" data-action="new">新規作成</button>
+                        <button class="popover-btn" data-action="save-json">名前を付けて保存</button>
+                        <button class="popover-btn" data-action="import">ファイルから読込</button>
+                    </div>
+                </div>
+            `;
+            popover.style.left = `${rect.left}px`;
+            popover.style.top = `${rect.bottom + 4}px`;
         } else { // 'newLabel' or 'existingLabel'
             let buttonsHtml = '';
             if (type === 'newLabel') {
@@ -739,7 +804,7 @@
             } else { // 'existingLabel'
                 buttonsHtml = `<button class="popover-btn" data-action="update">更新</button><button class="popover-btn" data-action="move">移動</button><button class="popover-btn" data-action="copy">コピー</button><button class="popover-btn" data-action="delete">削除</button>`;
             }
-            popoverHtml = `<div class="popover-actions">${buttonsHtml}</div>`;
+            popoverHtml += `<div class="popover-actions">${buttonsHtml}</div>`;
             // ポップオーバーをラベルの右側に表示
             popover.style.left = `${rect.right + 8}px`;
             popover.style.top = `${rect.top}px`;
@@ -914,7 +979,7 @@
             clearTimeout(clickTimer);
             clickTimer = setTimeout(() => {
                 performSingleClickAction(clickedCellEl);
-            }, 200);
+            }, 250); // 少し長くして誤認識を防ぐ
         }
     };
     
@@ -960,6 +1025,30 @@
              render();
              return;
         }
+
+        if (action === 'close') {
+            hidePopover();
+            return;
+        }
+
+        // --- Data Ops popover actions
+        if (action === 'new') {
+            handleNew();
+            hidePopover();
+            return;
+        }
+        if (action === 'save-json') {
+            handleSave();
+            hidePopover();
+            return;
+        }
+        if (action === 'import') {
+            handleImport();
+            hidePopover();
+            return;
+        }
+
+
         switch(action) {
             case 'prev-year':
                 currentDate.setFullYear(currentDate.getFullYear() - 1);
@@ -1126,12 +1215,11 @@
     };
     
     const handleDocumentClick = (e) => {
-        if (popover.style.display !== 'none') {
-            const rect = popover.getBoundingClientRect();
-            if (e.clientX >= rect.left && e.clientX <= rect.right &&
-                e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                return;
-            }
+        // popoverの内部、またはpopoverをトリガーした要素をクリックした場合は何もしない
+        if (e.target.closest('#popover') || 
+            e.target.closest('.year-month-selector') ||
+            e.target.closest('.id-control')) {
+            return;
         }
 
         if (e.target.closest('.label.editing') || 
@@ -1139,6 +1227,12 @@
             return;
         }
         
+        // 上記以外でpopoverが表示されている場合は閉じる
+        if (popover.style.display !== 'none') {
+            hidePopover();
+        }
+        
+        // 編集中のラベルや選択中のセルがある場合、それを解除する
         if (activeLabelInfo || selectedDateForTemplate || moveInfo) {
             hidePopover();
             updateDecorationBar();
@@ -1395,15 +1489,14 @@
                         ${year}年 ${month + 1}月
                         </span>
                     </h1>
-                    <div class="id-control">
-                        <label for="calendar-id">ID:</label>
+                    <div id="id-control-container" class="id-control">
                         <input type="text" id="calendar-id" placeholder="スケジュール名を入力">
                     </div>
                 </div>
                 <div class="data-ops">
-                    <button id="new-btn">新規</button>
-                    <button id="save-btn">保存</button>
-                    <button id="import-btn">読込</button>
+                    <button id="new-btn" data-action="new">新規</button>
+                    <button id="save-btn" data-action="save-json">保存</button>
+                    <button id="import-btn" data-action="import">読込</button>
                 </div>
             </div>
             <div class="decoration-bar">
@@ -1446,10 +1539,27 @@
             showPopover(e.currentTarget, 'yearMonth');
         }
       });
+      
+      // PC用ボタン
+      const dataOpsContainer = document.querySelector('.data-ops');
+      if (dataOpsContainer) {
+          dataOpsContainer.addEventListener('click', (e) => {
+              const action = e.target.dataset.action;
+              if (action === 'new') handleNew();
+              if (action === 'save-json') handleSave();
+              if (action === 'import') handleImport();
+          });
+      }
 
-      document.getElementById('new-btn').addEventListener('click', handleNew);
-      document.getElementById('save-btn').addEventListener('click', handleSave);
-      document.getElementById('import-btn').addEventListener('click', handleImport);
+      // Mobile用ポップオーバートリガー
+      const idControlContainer = document.getElementById('id-control-container');
+      idControlContainer.addEventListener('click', (e) => {
+        if (window.innerWidth > 768) return;
+        // input自体をクリックした場合はpopoverを出さない
+        if (e.target.tagName === 'INPUT') return;
+        e.stopPropagation();
+        showPopover(idControlContainer, 'dataOps');
+      });
       
       const idInput = document.getElementById('calendar-id');
       idInput.value = currentId;
