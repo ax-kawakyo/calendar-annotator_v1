@@ -55,6 +55,7 @@
     .header-top {
       display: flex;
       align-items: center;
+      margin-bottom: 16px;
       gap: 16px;
     }
     .header-title {
@@ -133,11 +134,73 @@
     }
     #import-btn:hover { background-color: #d0e7ff; }
 
+
+    /* 装飾バー */
+    .decoration-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border-color);
+      background-color: #fcfcfc;
+    }
+    .deco-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .deco-control label {
+      font-size: 13px;
+      color: #555;
+    }
+    .deco-control input[type="color"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .deco-control input[type="color"]::-webkit-color-swatch {
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+    }
+    .deco-control input[type="range"] {
+      width: 100px;
+    }
+    .deco-control .font-size-value {
+      font-size: 13px;
+      width: 20px;
+      text-align: right;
+    }
+    .style-btn-group button {
+      background: var(--bg-white);
+      border: 1px solid #ccc;
+      font-size: 14px;
+      padding: 4px 10px;
+      cursor: pointer;
+      pointer-events: all; /* クリックイベントを確実に拾う */
+    }
+    .style-btn-group button:first-child {
+      border-radius: 4px 0 0 4px;
+      border-right: none;
+    }
+    .style-btn-group button:last-child {
+      border-radius: 0 4px 4px 0;
+    }
+    .style-btn-group button.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
     /* カレンダーボード */
     .calendar-board {
       padding: 16px;
       flex-grow: 1;
-      overflow-y: auto;
     }
     .calendar-grid {
       display: grid;
@@ -295,7 +358,7 @@
         gap: 6px;
         flex-wrap: wrap; /* ボタンが折り返せるように */
     }
-    .popover-template-section, .popover-deco-section {
+    .popover-template-section {
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -335,62 +398,6 @@
     .popover-btn:hover {
         background-color: #f0f0f0;
     }
-    
-    .deco-control {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .deco-control label {
-      font-size: 13px;
-      color: #555;
-    }
-    .deco-control input[type="color"] {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      width: 28px;
-      height: 28px;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-    }
-    .deco-control input[type="color"]::-webkit-color-swatch {
-      border-radius: 50%;
-      border: 1px solid var(--border-color);
-    }
-    .deco-control input[type="range"] {
-      width: 100px;
-    }
-    .deco-control .font-size-value {
-      font-size: 13px;
-      width: 20px;
-      text-align: right;
-    }
-    .style-btn-group {
-      display: flex;
-    }
-    .style-btn-group button {
-      background: var(--bg-white);
-      border: 1px solid #ccc;
-      font-size: 14px;
-      padding: 4px 10px;
-      cursor: pointer;
-    }
-    .style-btn-group button:first-child {
-      border-radius: 4px 0 0 4px;
-      border-right: none;
-    }
-    .style-btn-group button:last-child {
-      border-radius: 0 4px 4px 0;
-    }
-    .style-btn-group button.active {
-      background-color: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-    }
-
 
     /* --- Popover Button Color Scheme --- */
 
@@ -462,17 +469,6 @@
     .popover-btn[data-action="move"]:hover {
         background-color: #ffefc2;
         border-color: #ffe082;
-    }
-    
-    /* Style action - Light Purple */
-    .popover-btn[data-action="style"] {
-        background-color: #f3e8ff;
-        color: #6f42c1;
-        border: 1px solid #d6bbfb;
-    }
-    .popover-btn[data-action="style"]:hover {
-        background-color: #e9d6ff;
-        border-color: #c09bf9;
     }
 
     /* --- Year Month Popover --- */
@@ -577,13 +573,6 @@
         width: 100%;
         pointer-events: none; /* Make clicks pass through to the parent container */
       }
-      .id-control input:read-only {
-        pointer-events: none;
-      }
-      .id-control input:not(:read-only) {
-        pointer-events: auto;
-        cursor: text;
-      }
       .id-control::after {
         content: '☰';
         color: #888;
@@ -592,6 +581,9 @@
       }
       .data-ops {
         display: none; /* Hide original buttons on mobile */
+      }
+      .decoration-bar {
+        display: none;
       }
       .calendar-board {
         padding: 4px;
@@ -605,7 +597,7 @@
         height: auto;
       }
       .date-cell {
-        min-height: 85px; /* セルの高さを調整 */
+        min-height: 100px; /* セルの高さを確保 */
         padding: 4px;
         display: flex;
         flex-direction: column;
@@ -643,6 +635,8 @@
             font-size: 0.9em;
         }
     }
+
+
   </style>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -665,6 +659,13 @@
     let dragInfo = null; // { id, element, offsetX, offsetY, hasMoved, startX, startY }
     let moveInfo = null; // { labelId } - for tap-based moving on mobile
     let clickTimer = null; // for distinguishing single/double clicks
+    let defaultStyle = {
+        color: '#333333',
+        backgroundColor: '#fffbe6',
+        fontSize: '13',
+        fontWeight: 'normal',
+        fontStyle: 'normal',
+    };
     const LOCAL_STORAGE_KEY_LABELS = 'calendar-annotator-labels';
     const LOCAL_STORAGE_KEY_TEMPLATES = 'calendar-annotator-templates';
 
@@ -797,77 +798,107 @@
             `;
             popover.style.left = `${rect.left}px`;
             popover.style.top = `${rect.bottom + 4}px`;
-        } else if (type === 'decorate') {
-            const style = activeLabelInfo?.style;
-            popoverHtml += `
-              <div class="popover-content popover-deco-section">
-                  <div class="deco-control">
-                    <label>文字色</label>
-                    <input type="color" value="${style.color}" data-style="color">
-                  </div>
-                  <div class="deco-control">
-                    <label>ラベル色</label>
-                    <input type="color" value="${style.backgroundColor}" data-style="backgroundColor">
-                  </div>
-                  <div class="deco-control">
-                    <label>大きさ</label>
-                    <input type="range" value="${style.fontSize}" min="10" max="24" step="1" data-style="fontSize">
-                    <span class="font-size-value">${style.fontSize}</span>
-                  </div>
-                  <div class="deco-control">
-                    <div class="style-btn-group">
-                      <button class="${style.fontWeight === 'bold' ? 'active' : ''}" data-style="fontWeight"><b>B</b></button>
-                      <button class="${style.fontStyle === 'italic' ? 'active' : ''}" data-style="fontStyle"><i>I</i></button>
-                    </div>
-                  </div>
-              </div>
-            `;
-             popover.style.left = `${rect.right + 8}px`;
-             popover.style.top = `${rect.top}px`;
-             popover.style.minWidth = 'auto';
         } else { // 'newLabel' or 'existingLabel'
             let buttonsHtml = '';
             if (type === 'newLabel') {
                 let pasteButtonHtml = clipboard ? `<button class="popover-btn" data-action="paste">貼付</button>` : '';
                 buttonsHtml = `${pasteButtonHtml}<button class="popover-btn" data-action="save">保存</button><button class="popover-btn" data-action="cancel">取消</button>`;
             } else { // 'existingLabel'
-                buttonsHtml = `<button class="popover-btn" data-action="update">更新</button><button class="popover-btn" data-action="style">装飾</button><button class="popover-btn" data-action="move">移動</button><button class="popover-btn" data-action="copy">コピー</button><button class="popover-btn" data-action="delete">削除</button>`;
+                buttonsHtml = `<button class="popover-btn" data-action="update">更新</button><button class="popover-btn" data-action="move">移動</button><button class="popover-btn" data-action="copy">コピー</button><button class="popover-btn" data-action="delete">削除</button>`;
             }
             popoverHtml += `<div class="popover-actions">${buttonsHtml}</div>`;
+            // ポップオーバーをラベルの右側に表示
             popover.style.left = `${rect.right + 8}px`;
             popover.style.top = `${rect.top}px`;
-            popover.style.minWidth = 'auto';
+            popover.style.minWidth = 'auto'; // ラベル用はコンパクトに
         }
         
         popover.innerHTML = popoverHtml;
         popover.style.display = 'block';
 
+        // スマホの場合はtransformをリセット
         if (window.innerWidth <= 768) {
-            popover.style.left = '50%';
-            popover.style.top = '50%';
-            popover.style.transform = 'translate(-50%, -50%)';
+            popover.style.transform = '';
+        }
+
+        if (type === 'yearMonth') {
+             const yearInput = document.getElementById('year-input');
+             yearInput.addEventListener('change', (e) => {
+                const newYear = parseInt(e.target.value, 10);
+                if (!isNaN(newYear)) {
+                    currentDate.setFullYear(newYear);
+                    // ポップオーバーを再描画して月グリッドを更新
+                    showPopover(targetElement, 'yearMonth');
+                }
+             });
         }
     };
     
     const hidePopover = () => {
-        if(activeLabelInfo?.id) {
-            // If there's an active label, ensure its style changes are saved before clearing.
-            const label = labels.find(l => l.id === activeLabelInfo.id);
-            if (label) {
-                label.style = activeLabelInfo.style;
-                saveLabelsToLocalStorage();
-            }
+        if(activeLabelInfo || selectedDateForTemplate || moveInfo) {
+            activeLabelInfo = null;
+            selectedDateForTemplate = null;
+            moveInfo = null; // 移動モードもキャンセル
+            render();
         }
-        activeLabelInfo = null;
-        selectedDateForTemplate = null;
-        moveInfo = null; // 移動モードもキャンセル
         popover.style.display = 'none';
         popover.style.minWidth = '280px'; // デフォルトに戻す
-        render(); // Re-render to clear editing states
     };
     
+    // --- Decoration Bar Functions ---
+    const updateDecorationBar = () => {
+        if (window.innerWidth <= 768) return; // スマホでは非表示なので何もしない
+        const currentStyle = activeLabelInfo?.style || defaultStyle;
+
+        document.getElementById('text-color-picker').value = currentStyle.color;
+        document.getElementById('label-color-picker').value = currentStyle.backgroundColor;
+        const fontSizeSlider = document.getElementById('font-size-slider');
+        fontSizeSlider.value = currentStyle.fontSize;
+        document.getElementById('font-size-value').textContent = currentStyle.fontSize;
+        
+        document.getElementById('bold-btn').classList.toggle('active', currentStyle.fontWeight === 'bold');
+        document.getElementById('italic-btn').classList.toggle('active', currentStyle.fontStyle === 'italic');
+    };
+
+    const handleDecorationChange = (e) => {
+        const target = e.target.closest('[data-style]');
+        if (!target) return;
+
+        const styleProp = target.dataset.style;
+        let value = target.value;
+
+        const isToggleButton = target.tagName === 'BUTTON';
+        const targetStyle = activeLabelInfo?.style || defaultStyle;
+
+        if (isToggleButton) {
+            const currentVal = targetStyle[styleProp];
+            if (styleProp === 'fontWeight') value = currentVal === 'bold' ? 'normal' : 'bold';
+            if (styleProp === 'fontStyle') value = currentVal === 'italic' ? 'normal' : 'italic';
+        }
+
+        targetStyle[styleProp] = value;
+
+        if (activeLabelInfo) {
+            const activeLabelEl = document.querySelector('.label.editing');
+            if (activeLabelEl) {
+                 if(styleProp === 'fontSize') {
+                    activeLabelEl.style.fontSize = `${value}px`;
+                    document.getElementById('font-size-value').textContent = value;
+                } else if (styleProp === 'fontWeight' || styleProp === 'fontStyle' || styleProp === 'color' || styleProp === 'backgroundColor') {
+                    activeLabelEl.style[target.dataset.cssProp] = value;
+                }
+            }
+        } else {
+             if (styleProp === 'fontSize') {
+                document.getElementById('font-size-value').textContent = value;
+            }
+        }
+        updateDecorationBar();
+    };
+
     // --- イベントハンドラ ---
     const handleCalendarClick = (e) => {
+        // 移動モードの場合の処理を最優先
         if (moveInfo) {
             const targetCell = e.target.closest('.date-cell');
             if (targetCell) {
@@ -876,7 +907,7 @@
                     const newDate = targetCell.dataset.date;
                     const labelsOnNewDate = labels.filter(l => l.date === newDate && l.id !== labelToMove.id).length;
                     labelToMove.date = newDate;
-                    labelToMove.top = 5 + labelsOnNewDate * 28;
+                    labelToMove.top = 5 + labelsOnNewDate * 28; // 衝突を避ける
                     labelToMove.left = 5;
                 }
             }
@@ -891,7 +922,9 @@
         const clickedLabelEl = e.target.closest('.label');
         const clickedCellEl = e.target.closest('.date-cell');
 
-        if (e.target.closest('#popover')) return;
+        if (e.target.closest('#popover') || e.target.closest('.decoration-bar')) {
+            return;
+        }
 
         const isPopoverVisible = popover.style.display !== 'none';
         if(isPopoverVisible && !clickedLabelEl && !clickedCellEl) {
@@ -917,10 +950,11 @@
                 render();
                 showPopover(cellEl, 'cell');
             }
+            updateDecorationBar();
         };
 
         if (clickedLabelEl) {
-            if (clickTimer) clearTimeout(clickTimer);
+            if (clickTimer) clearTimeout(clickTimer); // ダブルクリック待機をキャンセル
             e.stopPropagation();
             if (selectedDateForTemplate) {
                 selectedDateForTemplate = null;
@@ -938,19 +972,21 @@
             setTimeout(() => {
                 const activeLabelEl = document.querySelector(`.label[data-id="${labelId}"]`);
                 if (activeLabelEl) {
+                    activeLabelEl.focus();
                     showPopover(activeLabelEl, 'existingLabel');
                 }
             }, 0);
+             updateDecorationBar();
         } else if (clickedCellEl) {
             clearTimeout(clickTimer);
             clickTimer = setTimeout(() => {
                 performSingleClickAction(clickedCellEl);
-            }, 250);
+            }, 250); // 少し長くして誤認識を防ぐ
         }
     };
     
     const handleCalendarDblClick = (e) => {
-        if (clickTimer) clearTimeout(clickTimer);
+        if (clickTimer) clearTimeout(clickTimer); // シングルクリックのタイマーをキャンセル
 
         const clickedCellEl = e.target.closest('.date-cell:not(.other-month)');
         if (!clickedCellEl || moveInfo) return;
@@ -959,96 +995,36 @@
 
         const dateStr = clickedCellEl.dataset.date;
         const labelsOnDate = labels.filter(l => l.date === dateStr).length;
-        
-        const newLabel = {
-            id: Date.now(),
+        activeLabelInfo = {
+            type: 'new',
             date: dateStr,
             text: '新規ラベル',
             top: 5 + labelsOnDate * 28,
             left: 5,
-            style: {
-                color: '#333333',
-                backgroundColor: '#fffbe6',
-                fontSize: '13',
-                fontWeight: 'normal',
-                fontStyle: 'normal',
-            }
+            style: { ...defaultStyle }
         };
-        labels.push(newLabel);
-
-        activeLabelInfo = { type: 'new', id: newLabel.id, style: { ...newLabel.style } };
         render();
 
         setTimeout(() => {
-            const newLabelEl = document.querySelector(`.label[data-id="${newLabel.id}"]`);
+            const newLabelEl = document.getElementById('temp-new-label');
             if (newLabelEl) {
-                newLabelEl.contentEditable = true;
                 newLabelEl.focus();
                 document.execCommand('selectAll', false, null);
                 showPopover(newLabelEl, 'newLabel');
-
-                const saveOnBlur = () => {
-                    newLabelEl.contentEditable = false;
-                    const label = labels.find(l => l.id === newLabel.id);
-                    if(label) label.text = newLabelEl.innerText.trim();
-                    hidePopover();
-                    newLabelEl.removeEventListener('blur', saveOnBlur);
-                };
-                newLabelEl.addEventListener('blur', saveOnBlur);
             }
         }, 0);
+        updateDecorationBar();
     };
-    
-    const handleDecorationPopoverInput = (e) => {
-        const target = e.target.closest('[data-style]');
-        if (!target || !activeLabelInfo) return;
-
-        const styleProp = target.dataset.style;
-        let value = target.value;
-
-        const isToggleButton = target.tagName === 'BUTTON';
-        const targetStyle = activeLabelInfo.style;
-
-        if (isToggleButton) {
-            const currentVal = targetStyle[styleProp];
-            if (styleProp === 'fontWeight') value = currentVal === 'bold' ? 'normal' : 'bold';
-            if (styleProp === 'fontStyle') value = currentVal === 'italic' ? 'normal' : 'italic';
-            target.classList.toggle('active');
-        } else if (styleProp === 'fontSize') {
-            const valueSpan = target.nextElementSibling;
-            if (valueSpan?.classList.contains('font-size-value')) {
-                valueSpan.textContent = value;
-            }
-        }
-        
-        targetStyle[styleProp] = value;
-        
-        const activeLabelEl = document.querySelector(`.label[data-id="${activeLabelInfo.id}"]`);
-        if (activeLabelEl) {
-             if(styleProp === 'fontSize') {
-                activeLabelEl.style.fontSize = `${value}px`;
-            } else {
-                activeLabelEl.style[styleProp] = value;
-            }
-        }
-    };
-
 
     const handlePopoverAction = (e) => {
-        if (e.target.closest('.popover-deco-section')) {
-            handleDecorationPopoverInput(e);
-            return;
-        }
-
         const action = e.target.dataset.action;
         const month = e.target.dataset.month;
         if (!action && month === undefined) return;
 
         if(month !== undefined) {
-             const newYear = parseInt(popover.querySelector('#year-input').value, 10);
-             if(!isNaN(newYear)) currentDate.setFullYear(newYear);
              currentDate.setMonth(parseInt(month, 10));
              hidePopover();
+             render();
              return;
         }
 
@@ -1058,64 +1034,71 @@
         }
 
         // --- Data Ops popover actions
-        if (action === 'new') { handleNew(); hidePopover(); return; }
-        if (action === 'save-json') { handleSave(); hidePopover(); return; }
-        if (action === 'import') { handleImport(); hidePopover(); return; }
+        if (action === 'new') {
+            handleNew();
+            hidePopover();
+            return;
+        }
+        if (action === 'save-json') {
+            handleSave();
+            hidePopover();
+            return;
+        }
+        if (action === 'import') {
+            handleImport();
+            hidePopover();
+            return;
+        }
 
 
         switch(action) {
-            case 'prev-year': {
-                const yearInput = popover.querySelector('#year-input');
-                const currentYear = parseInt(yearInput.value, 10);
-                yearInput.value = currentYear - 1;
+            case 'prev-year':
+                currentDate.setFullYear(currentDate.getFullYear() - 1);
+                showPopover(document.getElementById('year-month-selector'), 'yearMonth');
                 return;
-            }
-            case 'next-year': {
-                const yearInput = popover.querySelector('#year-input');
-                const currentYear = parseInt(yearInput.value, 10);
-                yearInput.value = currentYear + 1;
-                return;
-            }
+            case 'next-year':
+                 currentDate.setFullYear(currentDate.getFullYear() + 1);
+                 showPopover(document.getElementById('year-month-selector'), 'yearMonth');
+                 return;
             case 'go-today':
-                 const newYear = parseInt(popover.querySelector('#year-input').value, 10);
                  currentDate = new Date();
-                 if(!isNaN(newYear)) currentDate.setFullYear(newYear);
                  hidePopover();
+                 render();
                  return;
         }
-        
-        const activeLabelEl = document.querySelector(`.label[data-id="${activeLabelInfo?.id}"]`);
+
+        const activeLabelEl = document.querySelector('.label.editing');
 
         switch(action) {
             case 'save':
-                 if (activeLabelInfo?.type === 'new' && activeLabelEl) {
-                    const label = labels.find(l => l.id === activeLabelInfo.id);
-                    if(label) label.text = activeLabelEl.innerText.trim();
-                 }
-                 hidePopover();
+                if (activeLabelInfo?.type === 'new' && activeLabelEl) {
+                    const newLabel = {
+                        id: Date.now(),
+                        date: activeLabelInfo.date,
+                        text: activeLabelEl.innerText.trim() || '新規ラベル',
+                        top: activeLabelInfo.top,
+                        left: activeLabelInfo.left,
+                        style: activeLabelInfo.style
+                    };
+                    labels.push(newLabel);
+                    hidePopover();
+                }
                 break;
             case 'update':
                 if (activeLabelInfo?.type === 'existing' && activeLabelEl) {
-                   activeLabelEl.contentEditable = true;
-                   activeLabelEl.focus();
-                   document.execCommand('selectAll', false, null);
-                   popover.style.display = 'none';
-
-                   const saveOnBlur = () => {
-                       activeLabelEl.contentEditable = false;
-                       const label = labels.find(l => l.id === activeLabelInfo.id);
-                       if (label) label.text = activeLabelEl.innerText.trim();
-                       hidePopover();
-                       activeLabelEl.removeEventListener('blur', saveOnBlur);
-                   };
-                   activeLabelEl.addEventListener('blur', saveOnBlur);
+                    const label = labels.find(l => l.id === activeLabelInfo.id);
+                    if (label) {
+                        label.text = activeLabelEl.innerText.trim();
+                        label.style = activeLabelInfo.style;
+                    }
+                    hidePopover();
                 }
-                return; // Do not hide popover yet
+                break;
             case 'delete':
                 if (activeLabelInfo?.type === 'existing') {
                     labels = labels.filter(l => l.id !== activeLabelInfo.id);
+                    hidePopover();
                 }
-                hidePopover();
                 break;
             case 'copy':
                 if (activeLabelInfo?.type === 'existing') {
@@ -1123,52 +1106,59 @@
                     if (labelToCopy) {
                         clipboard = { text: labelToCopy.text, style: { ...labelToCopy.style } };
                     }
+                    hidePopover();
                 }
-                hidePopover();
                 break;
             case 'paste':
                 if (activeLabelInfo?.type === 'new' && clipboard) {
-                   const label = labels.find(l => l.id === activeLabelInfo.id);
-                   if (label) {
-                       label.text = clipboard.text;
-                       label.style = {...clipboard.style};
-                   }
+                    const newLabel = {
+                        id: Date.now(),
+                        date: activeLabelInfo.date,
+                        text: clipboard.text,
+                        top: activeLabelInfo.top,
+                        left: activeLabelInfo.left,
+                        style: { ...clipboard.style }
+                    };
+                    labels.push(newLabel);
+                    hidePopover();
                 }
-                hidePopover();
                 break;
             case 'move':
-                e.stopPropagation();
+                e.stopPropagation(); // BUGFIX: これがないと即座にhandleDocumentClickが発火して移動モードがキャンセルされる
                 if (activeLabelInfo?.type === 'existing') {
                     moveInfo = { labelId: activeLabelInfo.id };
-                    popover.style.display = 'none';
                     activeLabelInfo = null;
+                    popover.style.display = 'none';
                     render();
                 }
                 return;
-            case 'style':
-                if (activeLabelInfo?.type === 'existing' && activeLabelEl) {
-                    showPopover(activeLabelEl, 'decorate');
-                }
-                return;
             case 'cancel':
-                 if (activeLabelInfo?.type === 'new') {
-                    labels = labels.filter(l => l.id !== activeLabelInfo.id);
-                 }
                 hidePopover();
                 break;
             
             case 'save-as-template': {
                 if (!selectedDateForTemplate) return;
+                
                 const templateNameInput = document.getElementById('new-template-name-input');
+                if (!templateNameInput) return;
                 const templateName = templateNameInput.value.trim();
 
-                if (!templateName) { alert('テンプレート名を入力してください。'); templateNameInput.focus(); return; }
+                if (!templateName) {
+                    alert('テンプレート名を入力してください。');
+                    templateNameInput.focus();
+                    return;
+                }
 
                 const labelsOnDate = labels.filter(l => l.date === selectedDateForTemplate);
-                if (labelsOnDate.length === 0) { alert('テンプレートとして保存するラベルがありません。'); return; }
+                if (labelsOnDate.length === 0) {
+                    alert('テンプレートとして保存するラベルがありません。');
+                    return;
+                }
                 
                 if (templates.some(t => t.name === templateName)) {
-                    if (!confirm(`テンプレート名 "${templateName}" は既に存在します。上書きしますか？`)) return;
+                    if (!confirm(`テンプレート名 "${templateName}" は既に存在します。上書きしますか？`)) {
+                        return;
+                    }
                     templates = templates.filter(t => t.name !== templateName);
                 }
 
@@ -1184,8 +1174,10 @@
                 if (!selectedDateForTemplate) return;
                 const templateSelect = document.getElementById('popover-template-select');
                 const selectedTemplateName = templateSelect.value;
-                if (!selectedTemplateName) { alert('適用するテンプレートを選択してください。'); return; }
-
+                if (!selectedTemplateName) {
+                    alert('適用するテンプレートを選択してください。');
+                    return;
+                }
                 const template = templates.find(t => t.name === selectedTemplateName);
                 if (template) {
                     template.labels.forEach(templateLabel => {
@@ -1204,7 +1196,10 @@
              case 'delete-template':
                 if (!selectedDateForTemplate) return;
                 const templateToDelete = document.getElementById('popover-template-select').value;
-                if (!templateToDelete) { alert('削除するテンプレートを選択してください。'); return; }
+                if (!templateToDelete) {
+                     alert('削除するテンプレートを選択してください。');
+                    return;
+                }
                 if (confirm(`テンプレート "${templateToDelete}" を削除しますか？`)) {
                     templates = templates.filter(t => t.name !== templateToDelete);
                     saveTemplatesToLocalStorage();
@@ -1213,28 +1208,44 @@
                 }
                 break;
         }
+
+        if (action !== 'copy' && action !== 'apply-template' && action !== 'delete-template') {
+            saveLabelsToLocalStorage();
+            render();
+            updateDecorationBar();
+        }
     };
     
     const handleDocumentClick = (e) => {
+        // popoverの内部、またはpopoverをトリガーした要素をクリックした場合は何もしない
         if (e.target.closest('#popover') || 
             e.target.closest('.year-month-selector') ||
             e.target.closest('.id-control')) {
             return;
         }
 
-        if (e.target.closest('.label.editing')) return;
+        if (e.target.closest('.label.editing') || 
+            e.target.closest('.decoration-bar')) {
+            return;
+        }
         
+        // 上記以外でpopoverが表示されている場合は閉じる
         if (popover.style.display !== 'none') {
             hidePopover();
-        } else if (activeLabelInfo || selectedDateForTemplate) {
+        }
+        
+        // 編集中のラベルや選択中のセルがある場合、それを解除する
+        if (activeLabelInfo || selectedDateForTemplate || moveInfo) {
             hidePopover();
+            updateDecorationBar();
         }
     };
 
     // --- Drag and Drop Handlers ---
     const handleDragStart = (e) => {
-        if (window.matchMedia("(pointer: coarse)").matches) return;
-        
+        if (window.matchMedia("(pointer: coarse)").matches) {
+            return;
+        }
         const labelEl = e.target.closest('.label');
         if (!labelEl || labelEl.isContentEditable || moveInfo) return;
 
@@ -1267,8 +1278,11 @@
             dragInfo.hasMoved = true;
             const labelEl = dragInfo.element;
             const computedStyle = window.getComputedStyle(labelEl);
+            const width = computedStyle.width;
+            
             labelEl.classList.add('dragging');
-            labelEl.style.width = computedStyle.width;
+            labelEl.style.width = width;
+            
             document.body.appendChild(labelEl);
         }
 
@@ -1284,7 +1298,10 @@
 
         document.removeEventListener('mousemove', handleDragging);
 
-        if (!wasDragging) { dragInfo = null; return; }
+        if (!wasDragging) {
+            dragInfo = null;
+            return;
+        }
         
         draggedEl.style.visibility = 'hidden';
         const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
@@ -1316,28 +1333,25 @@
     
     // --- Data I/O Handlers ---
     const handleNew = () => {
-        if (labels.length > 0 && !confirm('現在のラベルをすべてクリアして、新規作成しますか？\n保存していない変更は失われます。')) return;
-
+        if (labels.length > 0 && !confirm('現在のラベルをすべてクリアして、新規作成しますか？\n保存していない変更は失われます。')) {
+            return;
+        }
         labels = [];
         currentId = '';
         selectedDateForTemplate = null;
         saveLabelsToLocalStorage();
         render();
-        
-        if (window.innerWidth <= 768) {
-            const idInput = document.getElementById('calendar-id');
-            idInput.readOnly = false;
-            idInput.focus();
-            idInput.select();
-            idInput.addEventListener('blur', () => { idInput.readOnly = true; }, { once: true });
-        }
     };
 
     const handleSave = () => {
         const idInput = document.getElementById('calendar-id');
         currentId = idInput.value.trim();
 
-        if (!currentId) { alert('IDを入力してください。'); idInput.focus(); return; }
+        if (!currentId) {
+            alert('IDを入力してください。');
+            idInput.focus();
+            return;
+        }
         
         const now = new Date();
         const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
@@ -1393,18 +1407,23 @@
 
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
+
       const firstDayOfMonth = new Date(year, month, 1);
       const lastDayOfMonth = new Date(year, month + 1, 0);
+
       const startDate = new Date(firstDayOfMonth);
       startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay());
+
       const endDate = new Date(lastDayOfMonth);
       endDate.setDate(endDate.getDate() + (6 - lastDayOfMonth.getDay()));
+
       const dates = [];
       let currentDatePointer = new Date(startDate);
       while (currentDatePointer <= endDate) {
         dates.push(new Date(currentDatePointer));
         currentDatePointer.setDate(currentDatePointer.getDate() + 1);
       }
+
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -1422,28 +1441,46 @@
         const isSunday = dayOfWeek === 0;
         const isSaturday = dayOfWeek === 6;
         const dateStr = formatDate(date);
+        
         const isSelectedForTemplate = selectedDateForTemplate === dateStr;
+
         const cellClasses = ['date-cell', isOtherMonth ? 'other-month' : '', isSelectedForTemplate ? 'selected-for-template' : ''].filter(Boolean).join(' ');
         const numberClasses = ['date-number', isToday ? 'today' : '', !isToday && isSunday ? 'sunday' : '', !isToday && isSaturday ? 'saturday' : ''].filter(Boolean).join(' ');
 
         const labelsForDate = labels.filter(label => label.date === dateStr);
         let labelsHtml = labelsForDate.map(label => {
-            const isEditing = activeLabelInfo?.id === label.id;
+            const isEditing = activeLabelInfo?.type === 'existing' && activeLabelInfo.id === label.id;
             const isBeingMoved = moveInfo?.labelId === label.id;
             const classes = `label ${isEditing ? 'editing' : ''} ${isBeingMoved ? 'is-being-moved' : ''}`;
             const style = getLabelStyle(label.style);
-            return `<div class="${classes}" data-id="${label.id}" style="top: ${label.top}px; left: ${label.left}px; ${style}">${label.text}</div>`;
+            return `
+            <div class="${classes}"
+                 contenteditable="${isEditing}"
+                 data-id="${label.id}"
+                 style="top: ${label.top}px; left: ${label.left}px; ${style}"
+            >${label.text}</div>
+            `;
         }).join('');
         
+        if (activeLabelInfo?.type === 'new' && activeLabelInfo.date === dateStr) {
+            const style = getLabelStyle(activeLabelInfo.style);
+            labelsHtml += `
+            <div class="label editing"
+                 id="temp-new-label"
+                 contenteditable="true"
+                 style="top: ${activeLabelInfo.top}px; left: ${activeLabelInfo.left}px; ${style}"
+            >${activeLabelInfo.text}</div>
+            `;
+        }
+
         return `
           <div class="${cellClasses}" data-date="${dateStr}">
             <div class="${numberClasses}">${date.getDate()}</div>
             <div class="labels-container">${labelsHtml}</div>
-          </div>`;
+          </div>
+        `;
       }).join('');
       
-      const isMobile = window.innerWidth <= 768;
-
       const appHtml = `
         <div class="app-container">
           <header class="header">
@@ -1455,7 +1492,7 @@
                         </span>
                     </h1>
                     <div id="id-control-container" class="id-control">
-                        <input type="text" id="calendar-id" placeholder="スケジュール名を入力" ${isMobile ? 'readonly' : ''}>
+                        <input type="text" id="calendar-id" placeholder="スケジュール名を入力">
                     </div>
                 </div>
                 <div class="data-ops">
@@ -1464,6 +1501,25 @@
                     <button id="import-btn" data-action="import">読込</button>
                 </div>
             </div>
+            <div class="decoration-bar">
+              <div class="deco-control">
+                <label for="text-color-picker">文字色</label>
+                <input type="color" id="text-color-picker" data-style="color" data-css-prop="color">
+              </div>
+              <div class="deco-control">
+                <label for="label-color-picker">ラベル色</label>
+                <input type="color" id="label-color-picker" data-style="backgroundColor" data-css-prop="backgroundColor">
+              </div>
+              <div class="deco-control">
+                <label for="font-size-slider">文字大きさ</label>
+                <input type="range" id="font-size-slider" min="10" max="24" step="1" data-style="fontSize" data-css-prop="fontSize">
+                <span id="font-size-value" class="font-size-value">13</span>
+              </div>
+              <div class="deco-control style-btn-group">
+                <button id="bold-btn" data-style="fontWeight" data-css-prop="fontWeight"><b>B</b></button>
+                <button id="italic-btn" data-style="fontStyle" data-css-prop="fontStyle"><i>I</i></button>
+              </div>
+            </div>
           </header>
           <main class="calendar-board" aria-label="カレンダー">
             <div class="calendar-grid" id="calendar-grid">
@@ -1471,14 +1527,13 @@
               ${dateCellsHtml}
             </div>
           </main>
-        </div>`;
+        </div>
+      `;
 
       root.innerHTML = appHtml;
 
       // --- イベントリスナーの登録 ---
       document.getElementById('year-month-selector').addEventListener('click', (e) => {
-        const newYear = parseInt(popover.querySelector('#year-input')?.value, 10);
-        if(!isNaN(newYear)) currentDate.setFullYear(newYear);
         e.stopPropagation();
         if (popover.style.display !== 'none' && popover.querySelector('.year-month-popover-content')) {
             hidePopover();
@@ -1487,6 +1542,7 @@
         }
       });
       
+      // PC用ボタン
       const dataOpsContainer = document.querySelector('.data-ops');
       if (dataOpsContainer) {
           dataOpsContainer.addEventListener('click', (e) => {
@@ -1497,18 +1553,19 @@
           });
       }
 
+      // Mobile用ポップオーバートリガー
       const idControlContainer = document.getElementById('id-control-container');
       idControlContainer.addEventListener('click', (e) => {
         if (window.innerWidth > 768) return;
-        const idInput = document.getElementById('calendar-id');
-        if (idInput && !idInput.readOnly) return;
         e.stopPropagation();
         showPopover(idControlContainer, 'dataOps');
       });
       
       const idInput = document.getElementById('calendar-id');
       idInput.value = currentId;
-      idInput.addEventListener('input', e => { currentId = e.target.value; });
+      idInput.addEventListener('input', e => {
+        currentId = e.target.value;
+      });
 
       const calendarGrid = document.getElementById('calendar-grid');
       calendarGrid.addEventListener('click', handleCalendarClick);
@@ -1519,6 +1576,15 @@
       
       document.removeEventListener('click', handleDocumentClick);
       document.addEventListener('click', handleDocumentClick);
+
+      const decoBar = document.querySelector('.decoration-bar');
+      if (decoBar) { // スマホでは存在しないのでnullチェック
+        decoBar.addEventListener('input', handleDecorationChange);
+        decoBar.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', handleDecorationChange);
+        });
+        updateDecorationBar();
+      }
     };
 
     // --- 初期化 ---
